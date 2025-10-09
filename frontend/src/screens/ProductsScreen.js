@@ -34,39 +34,56 @@ const ProductsScreen = ({ navigation }) => {
     loadProducts();
   }, []);
 
+  // actualizar stock localmente para no refrescar pantalla
+  const handleStockUpdate = (productId, newStock) => {
+    setProducts(prevProducts => 
+      prevProducts.map(product => 
+        product._id === productId 
+          ? { ...product, stock: newStock } 
+          : product
+      )
+    );
+  };
+
   const onRefresh = () => {
     setRefreshing(true);
     loadProducts();
   };
 
-  const getStockStyle = (stock) => {
-    if (stock === 0) return globalStyles.stockLow;
-    if (stock < 10) return globalStyles.stockMedium;
-    return globalStyles.stockHigh;
-  };
-
-  const getStockText = (stock) => {
-    if (stock === 0) return 'SIN STOCK';
-    if (stock < 10) return `BAJO (${stock})`;
-    return `DISPONIBLE (${stock})`;
-  };
-
   const renderProductItem = ({ item }) => (
     <TouchableOpacity
       style={globalStyles.card}
-      onPress={() => navigation.navigate('ProductDetail', { product: item })}
+      onPress={() => navigation.navigate('ProductDetail', { 
+        product: item,
+        onStockUpdate: handleStockUpdate 
+      })}
     >
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <View style={{ flex: 1 }}>
-          <Text style={[globalStyles.text, { fontWeight: 'bold' }]}>{item.nombre}</Text>
-          <Text style={globalStyles.text}>Categoría: {item.categoria}</Text>
-          <Text style={globalStyles.text}>Precio: ${item.precio}</Text>
-        </View>
-        <View style={[globalStyles.stockBadge, getStockStyle(item.stock)]}>
-          <Text style={{ color: COLORS.white, fontSize: 12, fontWeight: 'bold' }}>
-            {getStockText(item.stock)}
+          <Text style={[globalStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>
+            {item.nombre}
+          </Text>
+          <Text style={globalStyles.textSecondary}>
+            {item.categoria}
+          </Text>
+          <Text style={globalStyles.text}>
+            ${item.precio}
           </Text>
         </View>
+        
+        {/* STOCK */}
+        <Text style={{
+          fontSize: 20,
+          fontWeight: 'bold',
+          color: COLORS.warning,
+          backgroundColor: '#FFF3E0',
+          padding: 8,
+          borderRadius: 6,
+          minWidth: 40,
+          textAlign: 'center',
+        }}>
+          {item.stock}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -83,7 +100,7 @@ const ProductsScreen = ({ navigation }) => {
   return (
     <View style={globalStyles.container}>
       <Text style={globalStyles.subtitle}>
-        Total de productos: {products.length}
+        Productos: {products.length}
       </Text>
 
       <FlatList

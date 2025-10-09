@@ -32,22 +32,30 @@ const ScanScreen = ({ navigation }) => {
     try {
       console.log('QR escaneado:', data);
       
-      // Asumimos que el QR contiene el ID del producto
+      // El QR contiene el ID del producto
       const productId = data.trim();
       
       const response = await productsAPI.getById(productId);
       const product = response.data;
       
+      console.log('Producto encontrado:', product.nombre);
+      
+      // Navegar a la pantalla de detalle con la información del producto
       navigation.navigate('ProductDetail', { product });
+      
     } catch (error) {
       console.error('Error al buscar producto:', error);
       Alert.alert(
-        'Producto no encontrado',
-        'El código QR no corresponde a un producto válido',
+        'Producto No Encontrado',
+        'El código QR no corresponde a un producto válido en el sistema.',
         [
           {
-            text: 'OK',
+            text: 'Intentar Nuevamente',
             onPress: () => setScanned(false),
+          },
+          {
+            text: 'Volver',
+            onPress: () => navigation.goBack(),
           },
         ]
       );
@@ -66,9 +74,9 @@ const ScanScreen = ({ navigation }) => {
 
   if (!permission.granted) {
     return (
-      <View style={globalStyles.container}>
-        <Text style={globalStyles.text}>
-          Necesitamos permisos para usar la cámara
+      <View style={[globalStyles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={[globalStyles.text, { textAlign: 'center', marginBottom: 20 }]}>
+          GM Stock necesita acceso a la cámara para escanear códigos QR de productos.
         </Text>
         <TouchableOpacity style={globalStyles.button} onPress={requestPermission}>
           <Text style={globalStyles.buttonText}>Conceder Permiso</Text>
@@ -87,7 +95,7 @@ const ScanScreen = ({ navigation }) => {
           barcodeTypes: ['qr'],
         }}
       >
-        <View style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'flex-end' }}>
+        <View style={globalStyles.scannerOverlay}>
           {isLoading && (
             <View style={{ 
               position: 'absolute', 
@@ -97,33 +105,42 @@ const ScanScreen = ({ navigation }) => {
               bottom: 0, 
               justifyContent: 'center', 
               alignItems: 'center',
-              backgroundColor: 'rgba(0,0,0,0.5)'
             }}>
-              <ActivityIndicator size="large" color={COLORS.white} />
-              <Text style={{ color: COLORS.white, marginTop: 16 }}>Buscando producto...</Text>
+              <View style={[globalStyles.card, { padding: 20, alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+                <Text style={[globalStyles.text, { marginTop: 16 }]}>Buscando producto...</Text>
+              </View>
             </View>
           )}
           
-          <View style={{ padding: 20, backgroundColor: 'rgba(0,0,0,0.7)' }}>
-            <Text style={{ color: COLORS.white, textAlign: 'center', marginBottom: 16 }}>
+          <View style={{ padding: 20, backgroundColor: 'rgba(30, 144, 255, 0.9)' }}>
+            <Text style={{ 
+              color: COLORS.text, 
+              textAlign: 'center', 
+              marginBottom: 16, 
+              fontSize: 18,
+              fontWeight: 'bold'
+            }}>
               Escanea el código QR del producto
+            </Text>
+            <Text style={{ 
+              color: COLORS.text, 
+              textAlign: 'center', 
+              marginBottom: 20,
+              fontSize: 14 
+            }}>
+              Apunta la cámara hacia el código QR del producto para ver su información y stock.
             </Text>
             
             {scanned && (
               <TouchableOpacity
-                style={globalStyles.button}
+                style={[globalStyles.button, globalStyles.buttonSecondary]}
                 onPress={() => setScanned(false)}
               >
-                <Text style={globalStyles.buttonText}>Escanear de nuevo</Text>
+                <Text style={globalStyles.buttonText}>Escanear Otro Código</Text>
               </TouchableOpacity>
             )}
             
-            <TouchableOpacity
-              style={[globalStyles.button, globalStyles.buttonSecondary, { marginTop: 8 }]}
-              onPress={() => navigation.goBack()}
-            >
-              <Text style={globalStyles.buttonText}>Cancelar</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </CameraView>

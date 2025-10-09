@@ -36,7 +36,7 @@ api.interceptors.request.use(
   }
 );
 
-// Interceptor para respuestas - CORREGIDO
+// Interceptor para respuestas 
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -51,7 +51,6 @@ api.interceptors.response.use(
         if (clearAuthFunction) {
           clearAuthFunction();
         } else {
-          // Fallback
           try {
             await AsyncStorage.removeItem('userToken');
             await AsyncStorage.removeItem('userData');

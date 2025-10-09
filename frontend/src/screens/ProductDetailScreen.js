@@ -15,7 +15,7 @@ import { COLORS } from '../utils/constants';
 import { productsAPI } from '../services/api';
 
 const ProductDetailScreen = ({ route, navigation }) => {
-  const { product } = route.params;
+  const { product, onStockUpdate } = route.params; // Recibir callback
   const [stock, setStock] = useState(product.stock.toString());
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,11 +30,20 @@ const ProductDetailScreen = ({ route, navigation }) => {
     setIsLoading(true);
     try {
       await productsAPI.updateStock(product._id, newStock);
-      Alert.alert('Éxito', 'Stock actualizado correctamente');
-      navigation.goBack();
+      
+      if (onStockUpdate) {
+        onStockUpdate(product._id, newStock);
+      }
+      
+      Alert.alert(
+        'Stock Actualizado', 
+        `El stock de ${product.nombre} se actualizó correctamente a ${newStock} unidades.`,
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
+      
     } catch (error) {
       console.error('Error updating stock:', error);
-      Alert.alert('Error', 'No se pudo actualizar el stock');
+      Alert.alert('Error', 'No se pudo actualizar el stock. Intenta nuevamente.');
     } finally {
       setIsLoading(false);
     }
@@ -58,42 +67,44 @@ const ProductDetailScreen = ({ route, navigation }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView style={globalStyles.container}>
-        <View style={globalStyles.card}>
+        {/* Información del Producto */}
+        <View style={[globalStyles.card, globalStyles.cardGold]}>
           <Text style={globalStyles.title}>{product.nombre}</Text>
           
-          <View style={{ marginBottom: 16 }}>
-            <Text style={[globalStyles.text, { fontWeight: 'bold' }]}>Categoría:</Text>
-            <Text style={globalStyles.text}>{product.categoria}</Text>
+          {/* Precio */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+            <Text style={[globalStyles.text, { fontWeight: 'bold', marginRight: 8 }]}>Precio:</Text>
+            <Text style={[globalStyles.text, { fontSize: 20, fontWeight: 'bold', color: COLORS.accent }]}>
+              ${product.precio}
+            </Text>
           </View>
 
-          <View style={{ marginBottom: 16 }}>
-            <Text style={[globalStyles.text, { fontWeight: 'bold' }]}>Código QR:</Text>
-            <Text style={globalStyles.text}>{product.qr}</Text>
+          {/* Categoría */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+            <Text style={[globalStyles.text, { fontWeight: 'bold', marginRight: 8 }]}>Categoría:</Text>
+            <Text style={globalStyles.textSecondary}>{product.categoria}</Text>
           </View>
 
-          <View style={{ marginBottom: 16 }}>
-            <Text style={[globalStyles.text, { fontWeight: 'bold' }]}>Precio:</Text>
-            <Text style={globalStyles.text}>${product.precio}</Text>
-          </View>
-
-          <View style={{ marginBottom: 24 }}>
-            <Text style={[globalStyles.text, { fontWeight: 'bold' }]}>Stock Actual:</Text>
-            <Text style={[globalStyles.text, { fontSize: 18, fontWeight: 'bold' }]}>
-              {product.stock} unidades
+          {/* Stock Actual */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+            <Text style={[globalStyles.text, { fontWeight: 'bold', marginRight: 8 }]}>Stock Actual:</Text>
+            <Text style={[globalStyles.text, { fontSize: 20, fontWeight: 'bold', color: COLORS.warning }]}>
+              {product.stock}
             </Text>
           </View>
         </View>
 
-        <View style={globalStyles.card}>
+        {/* Actualizar Stock */}
+        <View style={[globalStyles.card, globalStyles.cardAccent]}>
           <Text style={globalStyles.subtitle}>Actualizar Stock</Text>
           
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginVertical: 16 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginVertical: 20 }}>
             <TouchableOpacity
-              style={[globalStyles.button, globalStyles.buttonDanger, { flex: 1, marginRight: 8 }]}
+              style={[globalStyles.button, globalStyles.buttonSecondary, { flex: 1, marginRight: 8 }]}
               onPress={decreaseStock}
               disabled={isLoading}
             >
-              <Text style={globalStyles.buttonText}>-</Text>
+              <Text style={[globalStyles.buttonText, { fontSize: 20 }]}>-</Text>
             </TouchableOpacity>
 
             <TextInput
@@ -102,7 +113,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
                 { 
                   flex: 2, 
                   textAlign: 'center',
-                  fontSize: 18,
+                  fontSize: 24,
                   fontWeight: 'bold'
                 }
               ]}
@@ -113,11 +124,11 @@ const ProductDetailScreen = ({ route, navigation }) => {
             />
 
             <TouchableOpacity
-              style={[globalStyles.button, globalStyles.buttonSuccess, { flex: 1, marginLeft: 8 }]}
+              style={[globalStyles.button, globalStyles.buttonSecondary, { flex: 1, marginLeft: 8 }]}
               onPress={increaseStock}
               disabled={isLoading}
             >
-              <Text style={globalStyles.buttonText}>+</Text>
+              <Text style={[globalStyles.buttonText, { fontSize: 20 }]}>+</Text>
             </TouchableOpacity>
           </View>
 
@@ -127,7 +138,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
             disabled={isLoading}
           >
             {isLoading ? (
-              <ActivityIndicator color={COLORS.white} />
+              <ActivityIndicator color={COLORS.text} />
             ) : (
               <Text style={globalStyles.buttonText}>Actualizar Stock</Text>
             )}
@@ -138,4 +149,4 @@ const ProductDetailScreen = ({ route, navigation }) => {
   );
 };
 
-export default ProductDetailScreen; // ✅ EXPORT DEFAULT
+export default ProductDetailScreen;

@@ -36,14 +36,14 @@ const AuthStack = () => (
   </Stack.Navigator>
 );
 
-// Navigator para usuarios SÍ autenticados  
+// Navigator para usuarios autenticados  
 const AppStack = () => (
   <Stack.Navigator>
     <Stack.Screen 
       name="Home" 
       component={HomeScreen}
       options={{ 
-        title: 'Inventario Inteligente',
+        title: 'GM Stock',
         headerStyle: { backgroundColor: COLORS.primary },
         headerTintColor: COLORS.white,
       }}

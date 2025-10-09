@@ -22,17 +22,27 @@ const verificarToken = async (req, res, next) => {
       return res.status(401).json({ message: "Usuario no encontrado" });
     }
 
-    // 4️⃣ Verificar si el token coincide con el guardado en BD
+    //Verificar si el token coincide con el guardado en BD
     if (usuario.token !== token) {
+      console.log('❌ Token no coincide con BD'); // 🔥 DEBUG
       return res.status(401).json({ message: "Token inválido o expirado" });
     }
 
     // 5️⃣ Adjuntar datos del usuario al request
     req.usuario = usuario;
-    next(); // continuar con la ruta
+    next();
 
   } catch (err) {
-    console.error("Error al verificar token:", err);
+    console.error("❌ Error al verificar token:", err.message);
+    
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: "Token expirado" });
+    }
+    
+    if (err.name === 'JsonWebTokenError') {
+      return res.status(401).json({ message: "Token inválido" });
+    }
+    
     return res.status(401).json({ message: "Token inválido o expirado" });
   }
 };

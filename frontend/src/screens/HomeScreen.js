@@ -15,30 +15,22 @@ const HomeScreen = ({ navigation }) => {
   const handleLogout = () => {
     Alert.alert(
       'Cerrar Sesión',
-      '¿Estás seguro de que quieres cerrar sesión?',
+      '¿Estás seguro de que quieres cerrar sesión de GM Stock?',
       [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Sí, cerrar sesión',
-          onPress: async () => {
-            await logout();
-            // ✅ NO navegar manualmente
-          },
-        },
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Sí, cerrar sesión', onPress: async () => await logout() },
       ]
     );
   };
 
   return (
     <ScrollView style={globalStyles.container}>
-      <Text style={globalStyles.title}>
-        Bienvenido, {userInfo?.usuario || 'Usuario'}
+      <Text style={[globalStyles.subtitle, { textAlign: 'center', marginBottom: 16 }]}>
+        Bienvenido {userInfo?.usuario || 'Usuario'}
       </Text>
 
-      <View style={globalStyles.card}>
+    {/*card de acciones rápidas*/}
+      <View style={[globalStyles.card, globalStyles.cardGold]}>
         <Text style={globalStyles.subtitle}>Acciones Rápidas</Text>
         
         <TouchableOpacity
@@ -49,18 +41,31 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[globalStyles.button, globalStyles.buttonSecondary]}
+          style={[globalStyles.button, globalStyles.buttonAccent]}
           onPress={() => navigation.navigate('Products')}
         >
           <Text style={globalStyles.buttonText}>Ver Todos los Productos</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[globalStyles.button, { backgroundColor: '#FF9500' }]}
+          style={[globalStyles.button, globalStyles.buttonSecondary]}
           onPress={handleLogout}
         >
           <Text style={globalStyles.buttonText}>Cerrar Sesión</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={globalStyles.card}>
+        <Text style={globalStyles.subtitle}>¿Cómo Usar GM Stock?</Text>
+        <Text style={globalStyles.textSecondary}>
+          • Escanea códigos QR para ver información de productos en tienda
+        </Text>
+        <Text style={globalStyles.textSecondary}>
+          • Actualiza el stock desde el detalle de cada producto o escaneando
+        </Text>
+        <Text style={globalStyles.textSecondary}>
+          • Consulta el inventario completo en cualquier momento
+        </Text>
       </View>
     </ScrollView>
   );

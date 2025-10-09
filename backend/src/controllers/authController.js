@@ -1,4 +1,3 @@
-// src/controllers/authController.js
 const Usuario = require("../models/Usuarios");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -15,7 +14,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "usuario y password son requeridos" });
     }
 
-    const elemento = await Usuario.findOne({ usuario: usuario.toLowerCase() });
+    const elemento = await Usuario.findOne({ usuario: usuario });
     if (!elemento) {
       // No dar pistas (no "usuario no existe")
       return res.status(401).json({ message: "Credenciales inválidas" });
@@ -69,7 +68,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "usuario y password son requeridos" });
     }
 
-    const elemento = await Usuario.findOne({ usuario: usuario.toLowerCase() });
+    const elemento = await Usuario.findOne({ usuario: usuario });
     if (elemento) {
       // No dar pistas (no "usuario no existe")
       return res.status(401).json({ message: "El usuario ya existe" });

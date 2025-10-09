@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 🔥 NUEVA FUNCIÓN: Para limpiar auth cuando el token es inválido
   const clearAuth = async () => {
     try {
       await AsyncStorage.removeItem('userToken');
@@ -91,7 +90,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    clearAuth, // 👈 EXPORTAR esta función
+    clearAuth, 
     isAuthenticated: !!userToken,
   };
 
